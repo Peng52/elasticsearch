@@ -131,5 +131,6 @@
     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:percolator-client:6.5.4" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:parent-join-client:6.5.4" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:rank-eval-client:6.5.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.4" level="project" />
   </component>
 </module>
