@@ -41,7 +41,11 @@ public class ElasticsearchApplication {
     //指定ID查询
     @RequestMapping(value = "/get/{index}/{type}/{id}",method = RequestMethod.GET)
     public ResponseEntity get(@PathVariable("index") String index, @PathVariable("type")String type,@PathVariable("id") String id){
+        //指定索引、类型、ID 查询
         GetResponse result = client.prepareGet(index, type, id).get();
+        if(!result.isExists()){
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         Map<String, Object> source = result.getSource();
         return new ResponseEntity(source, HttpStatus.OK);
     }
@@ -101,6 +105,7 @@ public class ElasticsearchApplication {
             @RequestParam(value = "account_number",required = false) String accout_number,
             @RequestParam(value = "firstname",required = false) String firstname
     ){
+        //更新
         UpdateRequest updateRequest = new UpdateRequest("bank", "user", id);
         //定义Json结构
         try {
@@ -134,18 +139,21 @@ public class ElasticsearchApplication {
     @PostMapping("/query")
     public ResponseEntity query(
             @RequestParam(value = "firstname",required = false) String firstname,
-            @RequestParam(value = "gte_age",defaultValue = "0") Integer gte_age,
+            @RequestParam(value = "gte_age",defaultValue = "0",required = false) Integer gte_age,
             @RequestParam(value = "lte_age") Integer lte_age
     ){
+        //bool查询
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         if(StringUtils.isNotBlank(firstname)){
             boolQuery.must(QueryBuilders.matchQuery("firstname",firstname));
         }
+        // 范围查询
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("age");
         rangeQuery.from(gte_age);
         if(lte_age!=null && lte_age >0){
             rangeQuery.to(lte_age);
         }
+        //把范围查询丢到bool查询类中
         boolQuery.filter(rangeQuery);
         SearchRequestBuilder builder = client.prepareSearch("bank")
                 .setTypes("user")
@@ -157,6 +165,7 @@ public class ElasticsearchApplication {
         SearchResponse searchResponse = builder.get();
         List<Map<String,Object>> list = new ArrayList<>();
         SearchHits hits = searchResponse.getHits();
+        // SearchHits 是  SearchHit 的子类
         for(SearchHit hit:hits){
             list.add(hit.getSourceAsMap());
         }
