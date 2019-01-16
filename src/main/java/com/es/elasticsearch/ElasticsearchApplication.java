@@ -21,6 +21,7 @@ import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -140,7 +141,9 @@ public class ElasticsearchApplication {
     public ResponseEntity query(
             @RequestParam(value = "firstname",required = false) String firstname,
             @RequestParam(value = "gte_age",defaultValue = "0",required = false) Integer gte_age,
-            @RequestParam(value = "lte_age") Integer lte_age
+            @RequestParam(value = "lte_age") Integer lte_age,
+            @RequestParam(value = "createTime") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            String createTime
     ){
         //bool查询
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
